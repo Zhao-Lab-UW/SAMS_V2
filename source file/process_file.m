@@ -86,7 +86,7 @@ function process_file(currentFile, file_folder, parentFolder, params, file_idx, 
     flagTooMuchList = {};
     
     % Process each electrode
-    for i = 1:nwr
+    for i = 1:1%nwr
         for j = 1:nwc
             num_electrode = 1;
             for m = 1:nec
@@ -173,13 +173,13 @@ function process_file(currentFile, file_folder, parentFolder, params, file_idx, 
         drawnow;
     catch
         % If figure creation fails, just print a message
-        fprintf(logfile,'\nFile %d/%d completed. Writing outputs...\n', file_idx, total_files);
-        fprintf(logfile,'Please wait. Do not close MATLAB.\n');
+        fprintf(logFile,'\nFile %d/%d completed. Writing outputs...\n', file_idx, total_files);
+        fprintf(logFile,'Please wait. Do not close MATLAB.\n');
     end
     
     % COMBINE AND SAVE DTW RESULTS
     if DTW_table_count > 0
-        fprintf(logfile,'Combining DTW results from %d electrodes...\n', DTW_table_count);
+        fprintf(logFile,'Combining DTW results from %d electrodes...\n', DTW_table_count);
         
         try
             % Concatenate all DTW tables
@@ -264,31 +264,31 @@ function process_file(currentFile, file_folder, parentFolder, params, file_idx, 
                     'VariableNames', {'Statistic', 'Value'});
                 
                 % Save DTW results to Excel
-                fprintf(logfile,'Writing DTW results to Excel...\n');
+                fprintf(logFile,'Writing DTW results to Excel...\n');
                 writetable(combined_DTW_table, [outputFolder, '\spike_sorting.xlsx'], 'Sheet', 'DTW_Distances');
                 writetable(T_DTW_summary, [outputFolder, '\spike_sorting.xlsx'], 'Sheet', 'DTW_Summary');
                 
-                fprintf(logfile,'DTW analysis complete: %d unit pairs analyzed, %.1f%% merged\n', ...
+                fprintf(logFile,'DTW analysis complete: %d unit pairs analyzed, %.1f%% merged\n', ...
                     total_pairs, merge_percentage);
-                fprintf(logfile,'DTW distance range: %.4f - %.4f (mean: %.4f)\n', ...
+                fprintf(logFile,'DTW distance range: %.4f - %.4f (mean: %.4f)\n', ...
                     min_DTW_distance, max_DTW_distance, mean_DTW_distance);
             else
-                fprintf(logfile,'No DTW data to save.\n');
+                fprintf(logFile,'No DTW data to save.\n');
             end
         catch ME
-            fprintf(logfile,'Error processing DTW results: %s\n', ME.message);
+            fprintf(logFile,'Error processing DTW results: %s\n', ME.message);
         end
     else
-        fprintf(logfile,'No electrodes had multiple units for DTW comparison.\n');
+        fprintf(logFile,'No electrodes had multiple units for DTW comparison.\n');
     end
     
     % Save PowerPoint
     if ~isempty(pptx)
         try
             pptx.save([outputFolder, '\', baseFileName]);
-            fprintf(logfile,'PowerPoint presentation saved successfully.\n');
+            fprintf(logFile,'PowerPoint presentation saved successfully.\n');
         catch ME
-            fprintf(logfile,'Error saving PowerPoint: %s', ME.message);
+            fprintf(logFile,'Error saving PowerPoint: %s', ME.message);
         end
     end
     
@@ -296,22 +296,22 @@ function process_file(currentFile, file_folder, parentFolder, params, file_idx, 
     save([outputFolder, '\burst_info_all.mat'], 'raster_raw', 'maxTime', 'sorting_results', '-v7.3');
     
     % Perform network burst analysis
-    fprintf(logfile,'Performing network burst analysis...\n');
+    fprintf(logFile,'Performing network burst analysis...\n');
     try
         get_network_burst_info_08202024(raster_raw, maxTime, fr, params.network_participation_threshold, ...
             params.min_spikes_E, params.max_ISI_E, params.min_spikes_N, params.max_ISI_N, ...
             outputFolder, sorting_results);
     catch ME
-        fprintf(logfile,'Error in network burst analysis: %s\n', ME.message);
+        fprintf(logFile,'Error in network burst analysis: %s\n', ME.message);
     end
     
     % Save results to Excel
-    fprintf(logfile,'Writing results to Excel...\n');
+    fprintf(logFile,'Writing results to Excel...\n');
     try
         writetable(T, [outputFolder, '\spike_sorting.xlsx'], 'Sheet', 'individual unit');
         writetable(T_electrode, [outputFolder, '\spike_sorting.xlsx'], 'Sheet', 'electrode statistics');
     catch ME
-        fprintf(logfile,'Error writing main results to Excel: %s\n', ME.message);
+        fprintf(logFile,'Error writing main results to Excel: %s\n', ME.message);
     end
 
     % Save check lists
@@ -338,36 +338,36 @@ function process_file(currentFile, file_folder, parentFolder, params, file_idx, 
         T_checklist = [T_pmua T_flag];
         writetable(T_checklist, [outputFolder, '\spike_sorting.xlsx'], 'Sheet', 'check list (active)');
     catch ME
-        fprintf(logfile,'Error writing check list to Excel: %s\n', ME.message);
+        fprintf(logFile,'Error writing check list to Excel: %s\n', ME.message);
     end
     
     % Print final summary
-    fprintf(logfile,'\n=== PROCESSING SUMMARY ===\n');
-    fprintf(logfile,'File: %s\n', fileName);
-    fprintf(logfile,'Total electrodes with spikes: %d\n', num_total_electrodes_with_spikes);
-    fprintf(logfile,'Total units detected: %d\n', num_total_detected_units);
-    fprintf(logfile,'Active units: %d\n', num_total_detected_units - num_inactive_units);
-    fprintf(logfile,'Inactive units: %d\n', num_inactive_units);
+    fprintf(logFile,'\n=== PROCESSING SUMMARY ===\n');
+    fprintf(logFile,'File: %s\n', fileName);
+    fprintf(logFile,'Total electrodes with spikes: %d\n', num_total_electrodes_with_spikes);
+    fprintf(logFile,'Total units detected: %d\n', num_total_detected_units);
+    fprintf(logFile,'Active units: %d\n', num_total_detected_units - num_inactive_units);
+    fprintf(logFile,'Inactive units: %d\n', num_inactive_units);
     if DTW_table_count > 0
-        fprintf(logfile,'Electrodes with DTW analysis: %d\n', DTW_table_count);
+        fprintf(logFile,'Electrodes with DTW analysis: %d\n', DTW_table_count);
     end
-    fprintf(logfile,'Possible MUA electrodes: %d\n', length(possibleMUAList) - (strcmp(possibleMUAList{end}, 'no check list') || strcmp(possibleMUAList{end}, '')));
-    fprintf(logfile,'Over-excluded electrodes: %d\n', length(flagTooMuchList) - (strcmp(flagTooMuchList{end}, 'no check list') || strcmp(flagTooMuchList{end}, '')));
-    fprintf(logfile,'Recording duration: %.2f seconds\n', maxTime);
-    fprintf(logfile,'Output folder: %s\n', outputFolder);
-    fprintf(logfile,'=========================\n\n');
+    fprintf(logFile,'Possible MUA electrodes: %d\n', length(possibleMUAList) - (strcmp(possibleMUAList{end}, 'no check list') || strcmp(possibleMUAList{end}, '')));
+    fprintf(logFile,'Over-excluded electrodes: %d\n', length(flagTooMuchList) - (strcmp(flagTooMuchList{end}, 'no check list') || strcmp(flagTooMuchList{end}, '')));
+    fprintf(logFile,'Recording duration: %.2f seconds\n', maxTime);
+    fprintf(logFile,'Output folder: %s\n', outputFolder);
+    fprintf(logFile,'=========================\n\n');
     
     % Close the notification window now that all outputs are written
     try
         if exist('h', 'var') && ishandle(h)
-            fprintf(logfile,'All outputs written successfully. Closing notification...\n');
+            fprintf(logFile,'All outputs written successfully. Closing notification...\n');
             close(h);
         end
     catch ME
-        fprintf(logfile,'Error closing notification window: %s\n', ME.message);
+        fprintf(logFile,'Error closing notification window: %s\n', ME.message);
     end
     
-    fprintf(logfile,'File processing completed: %s\n', fileName);
+    fprintf(logFile,'File processing completed: %s\n', fileName);
     % Close log file
     fclose(logFile);
 end
