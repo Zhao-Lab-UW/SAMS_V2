@@ -1,5 +1,5 @@
-function get_network_burst_info_08202024(rasterData, recordingDuration, samplingRate, networkParticipationThreshold, ...
-    minSpikesElectrode, maxISIElectrode, minSpikesNetwork, maxISINetwork, outputFolder, sortingResults)
+function get_network_burst_info_08202024(raster_raw, maxTime, samplingRate, networkParticipationThreshold, ...
+    minSpikesElectrode, maxISIElectrode, minSpikesNetwork, maxISINetwork, outputFolder, sorting_results)
 % GET_NETWORK_BURST_INFO_08202024 - Analyze network bursting activity across electrodes
 %
 % This function detects and analyzes network bursts by identifying synchronized 
@@ -7,7 +7,7 @@ function get_network_burst_info_08202024(rasterData, recordingDuration, sampling
 %
 % INPUTS:
 %   rasterData - Cell array containing spike times for each electrode
-%   recordingDuration - Total recording duration in seconds
+%   maxTime: recordingDuration - Total recording duration in seconds
 %   samplingRate - Recording sampling frequency in Hz
 %   networkParticipationThreshold - Fraction of electrodes required to participate in network burst (0-1)
 %   minSpikesElectrode - Minimum number of spikes per burst for electrode bursts
@@ -46,10 +46,10 @@ function get_network_burst_info_08202024(rasterData, recordingDuration, sampling
     resultsTable = table(networkMeasurements');
     
     % Initialize storage for burst information
-    burstInfoAll = {};
+    burst_info_all = {};
 
     % Check if rasterData is empty
-    if isempty(rasterData) || size(rasterData, 3) == 0
+    if isempty(raster_raw) || size(raster_raw, 3) == 0
         fprintf('No data available for network burst analysis.\n');
         % Save empty results
         writetable(resultsTable, [outputFolder, '\spike_sorting.xlsx'], 'Sheet', 'network burst');
@@ -57,41 +57,41 @@ function get_network_burst_info_08202024(rasterData, recordingDuration, sampling
     end
     
     % Process each well
-    for wellIndex = 1:size(rasterData, 3)
+    for wellIndex = 1:size(raster_raw, 3)
         % Skip if no data for this well
-        if isempty(rasterData{1, 2, wellIndex})
+        if isempty(raster_raw{1, 2, wellIndex})
             continue;
         end
         
         % Initialize electrode counter and data structures
         electrodeCount = 1;
-        spikeTrain = zeros(size(rasterData, 1), round(recordingDuration * samplingRate)); % electrodes × time
+        spikeTrain = zeros(size(raster_raw, 1), round(maxTime * samplingRate)); % electrodes × time
         electrodeIndices = [];
         currentElectrodeIndex = 1;
         
         % Get first electrode identifier for reference
-        referencedElectrode = rasterData{1, 2, wellIndex}(3:4);
+        referencedElectrode = raster_raw{1, 2, wellIndex}(3:4);
         activeElectrodeCount = 0;
         burstingElectrodeCount = 0;
         
         % Process each electrode in this well
-        for electrodeNum = 1:size(rasterData, 1)
+        for electrodeNum = 1:size(raster_raw, 1)
             % Skip empty electrodes
-            if isempty(rasterData{electrodeNum, 1, wellIndex})
+            if isempty(raster_raw{electrodeNum, 1, wellIndex})
                 spikeTrain(end, :) = [];
             else
                 % Count active electrodes
                 activeElectrodeCount = activeElectrodeCount + 1;
                 
                 % Get spike times and convert to timepoints
-                spikeTimes = round(rasterData{electrodeNum, 1, wellIndex} * samplingRate);
+                spikeTimes = round(raster_raw{electrodeNum, 1, wellIndex} * samplingRate);
                 spikeTimes(spikeTimes == 0) = 1;  % Ensure valid indices
                 
                 % Create binary spike train
                 spikeTrain(electrodeCount, spikeTimes) = 1;
                 
                 % Track electrode indices
-                currentElectrode = rasterData{electrodeNum, 2, wellIndex}(3:4);
+                currentElectrode = raster_raw{electrodeNum, 2, wellIndex}(3:4);
                 if isequal(referencedElectrode, currentElectrode)
                     electrodeIndices(electrodeCount, :) = currentElectrodeIndex;
                 else
@@ -110,7 +110,7 @@ function get_network_burst_info_08202024(rasterData, recordingDuration, sampling
                 spikeTrain, electrodeIndices, networkParticipationThreshold, ...
                 maxISINetwork, minSpikesNetwork);
             
-            burstInfoAll{wellIndex, 1} = networkBurstInfo;
+            burst_info_all{wellIndex, 1} = networkBurstInfo;
             
             % Calculate network metrics
             if isempty(networkBurstInfo)
@@ -121,7 +121,7 @@ function get_network_burst_info_08202024(rasterData, recordingDuration, sampling
                 
                 % Basic network burst counts and rates
                 numNetworkBursts = size(networkBurstInfo, 2);
-                networkBurstFrequency = numNetworkBursts / recordingDuration;
+                networkBurstFrequency = numNetworkBursts / maxTime;
                 
                 % Duration statistics
                 networkBurstDurationAvg = mean(networkBurstInfo(3, :));
@@ -183,9 +183,9 @@ function get_network_burst_info_08202024(rasterData, recordingDuration, sampling
         end
         
         % Add well metrics to results table
-        if ~isempty(rasterData{1, 2, wellIndex})
-            wellRow = rasterData{1, 2, wellIndex}(1);
-            wellCol = rasterData{1, 2, wellIndex}(2);
+        if ~isempty(raster_raw{1, 2, wellIndex})
+            wellRow = raster_raw{1, 2, wellIndex}(1);
+            wellCol = raster_raw{1, 2, wellIndex}(2);
             wellName = [char(wellRow + 'A' - 1), num2str(wellCol)];
             
             wellResultsTable = table(wellMetrics);
@@ -194,14 +194,14 @@ function get_network_burst_info_08202024(rasterData, recordingDuration, sampling
         end
         
         % Store well identifier
-        burstInfoAll{wellIndex, 2} = rasterData{1, 2, wellIndex};
+        burst_info_all{wellIndex, 2} = raster_raw{1, 2, wellIndex};
     end
     
     % Save results to Excel
     writetable(resultsTable, [outputFolder, '\spike_sorting.xlsx'], 'Sheet', 'network burst');
     
     % Save detailed burst information to MAT file
-    save([outputFolder, '\burst_info_all.mat'], 'burstInfoAll', 'rasterData', 'recordingDuration', 'sortingResults', '-v7.3');
+    save([outputFolder, '\burst_info_all.mat'], 'burst_info_all', 'raster_raw', 'maxTime', 'sorting_results', '-v7.3');
     
-    fprintf('Network burst analysis completed: %d wells processed\n', size(rasterData, 3));
+    fprintf('Network burst analysis completed: %d wells processed\n', size(raster_raw, 3));
 end

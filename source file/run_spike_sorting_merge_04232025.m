@@ -40,8 +40,7 @@ function run_spike_sorting_merge_04232025(file_folder, threshold_to_merge, refra
         mkdir(parentFolder);
     end
     
-    % Save initial variables to avoid clearing them in the loop
-    initialVars = who;
+    
     
     % Initialize progress bar
     try
@@ -49,7 +48,8 @@ function run_spike_sorting_merge_04232025(file_folder, threshold_to_merge, refra
     catch
         warning('Progressbar function not available. Progress will not be displayed.');
     end
-    
+    % Save initial variables to avoid clearing them in the loop
+    initialVars = who;
     % Process each file
     for fileIdx = 1:length(files)
         if fileIdx == 1

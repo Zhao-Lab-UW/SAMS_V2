@@ -30,12 +30,12 @@ function run_spike_sorting_with_selected_wells(file_folder, selectedWells, ...
         wellIndices{w, 3} = 1:3; % All electrodes in the well
         wellIndices{w, 4} = 1:3; % All electrodes in the well
     end
-    wellIndices
+
     % Process each file
     progressbar('Number of Files', 'Progress of current file');
     for fileIdx = 1:length(files)
         currentFile = files(fileIdx);
-        process_file_with_selected_wells(currentFile, file_folder, parentFolder, ...
+        process_file_with_selected_wells_log(currentFile, file_folder, parentFolder, ...
             params, fileIdx, length(files), wellIndices);
     end
     

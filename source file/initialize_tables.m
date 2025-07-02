@@ -1,4 +1,3 @@
-
 function [T, T_electrode, T_parameters] = initialize_tables(params)
     % Create table for unit measurements
     Measurements = {'Number of Spikes', 'Mean Firing Rate (Hz)', 'ISI in general',...
@@ -17,10 +16,36 @@ function [T, T_electrode, T_parameters] = initialize_tables(params)
         'max ISI (ms)','number of removed short ISIs'};
     T = table(Measurements');
     
-    % Create table for electrode measurements
-    Measurements_electrode = {'Total number of spikes', 'number of excluded spikes',...
-        'unsorted firing rates (Hz) ', 'Number of Units Detected'};
-    T_electrode = table(Measurements_electrode');
+    % Create expanded table for electrode measurements - fixed array concatenation
+    Measurements_electrode = {
+        'Total number of spikes'; 
+        'Number of excluded spikes';
+        'Unsorted firing rate (Hz)'; 
+        'Number of Units Detected';
+        'Average spike frequency per electrode (Hz)';
+        'Electrode firing rate (all units combined, Hz)';
+        'Unit firing rates - Mean (Hz)';
+        'Unit firing rates - Std (Hz)';
+        'Unit firing rates - Median (Hz)';
+        'Unit firing rates - Min (Hz)';
+        'Unit firing rates - Max (Hz)';
+        'Unit spike counts - Mean';
+        'Unit spike counts - Std';
+        'Unit spike counts - Median';
+        'Unit spike counts - Min';
+        'Unit spike counts - Max';
+        'Number of bursting units';
+        'Percentage of bursting units (%)';
+        'Average bursts per unit';
+        'Average burst duration per electrode (sec)';
+        'Average spikes per burst per electrode';
+        'Inter-burst interval - electrode average (sec)';
+        'Electrode burst frequency (Hz)';
+        'Total recording duration for electrode (sec)';
+        'Electrode activity span (first to last spike, sec)';
+        'Electrode activity percentage (%)'
+    };
+    T_electrode = table(Measurements_electrode);
     
     % Create parameters table
     parameter_list = {'threshold_to_merge', 'refractoryT', ...
