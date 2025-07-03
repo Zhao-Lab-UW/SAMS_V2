@@ -86,7 +86,7 @@ function process_file(currentFile, file_folder, parentFolder, params, file_idx, 
     flagTooMuchList = {};
     
     % Process each electrode
-    for i = 1:1%nwr
+    for i = 1:nwr
         for j = 1:nwc
             num_electrode = 1;
             for m = 1:nec
