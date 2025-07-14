@@ -120,7 +120,7 @@ function process_file(currentFile, file_folder, parentFolder, params, file_idx, 
                     try
                         [~, score, ~] = pca(spikes');
                     catch ME
-                        fprintf(logfile,'Error in PCA: %s\n', ME.message);
+                        fprintf(logFile,'Error in PCA: %s\n', ME.message);
                         continue;
                     end
                     
@@ -129,7 +129,7 @@ function process_file(currentFile, file_folder, parentFolder, params, file_idx, 
                         [electrode_results, electrode_stats] = process_electrode_06132025(electrode_DTW_folder, spikes, Times, i, j, m, n, ...
                             params, maxTime, maxSpikeAmp, minSpikeAmp, score);
                     catch ME
-                        fprintf(logfile,'Error processing electrode: %s\n', ME.message);
+                        fprintf(logFile,'Error processing electrode: %s\n', ME.message);
                         continue;
                     end
                     
@@ -151,7 +151,7 @@ function process_file(currentFile, file_folder, parentFolder, params, file_idx, 
                         maxTime, maxSpikeAmp, minSpikeAmp, baseFileName, spikes, Times, score, ...
                         all_DTW_tables, DTW_table_count);
                     catch ME
-                        fprintf(logfile,'Error updating results: %s\n', ME.message);
+                        fprintf(logFile,'Error updating results: %s\n', ME.message);
                     end
                 end
             end
