@@ -52,7 +52,7 @@ function get_network_burst_info_08202024(raster_raw, maxTime, samplingRate, netw
     if isempty(raster_raw) || size(raster_raw, 3) == 0
         fprintf('No data available for network burst analysis.\n');
         % Save empty results
-        writetable(resultsTable, [outputFolder, '\spike_sorting.xlsx'], 'Sheet', 'network burst');
+        writetable(resultsTable, [outputFolder, '/spike_sorting.xlsx'], 'Sheet', 'network burst');
         return;
     end
     
@@ -198,10 +198,10 @@ function get_network_burst_info_08202024(raster_raw, maxTime, samplingRate, netw
     end
     
     % Save results to Excel
-    writetable(resultsTable, [outputFolder, '\spike_sorting.xlsx'], 'Sheet', 'network burst');
+    writetable(resultsTable, [outputFolder, '/spike_sorting.xlsx'], 'Sheet', 'network burst');
     
     % Save detailed burst information to MAT file
-    save([outputFolder, '\burst_info_all.mat'], 'burst_info_all', 'raster_raw', 'maxTime', 'sorting_results', '-v7.3');
+    save([outputFolder, '/burst_info_all.mat'], 'burst_info_all', 'raster_raw', 'maxTime', 'sorting_results', '-v7.3');
     
     fprintf('Network burst analysis completed: %d wells processed\n', size(raster_raw, 3));
 end

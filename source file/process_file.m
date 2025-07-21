@@ -23,7 +23,7 @@ function process_file(currentFile, file_folder, parentFolder, params, file_idx, 
     if ~exist(outputFolder, 'dir')
         mkdir(outputFolder);
     end
-    electrode_DTW_folder = fullfile(outputFolder,'DTW figures\');
+    electrode_DTW_folder = fullfile(outputFolder,'DTW figures/');
     if ~exist(electrode_DTW_folder,'dir')
         mkdir(electrode_DTW_folder)
     end
@@ -49,7 +49,7 @@ function process_file(currentFile, file_folder, parentFolder, params, file_idx, 
     
     % Initialize analysis tables
     [T, T_electrode, T_parameters] = initialize_tables(params);
-    writetable(T_parameters, [outputFolder, '\spike_sorting.xlsx'], 'Sheet', 'parameter list');
+    writetable(T_parameters, [outputFolder, '/spike_sorting.xlsx'], 'Sheet', 'parameter list');
     
     % Initialize data structures
     raster_raw = {};
@@ -265,8 +265,8 @@ function process_file(currentFile, file_folder, parentFolder, params, file_idx, 
                 
                 % Save DTW results to Excel
                 fprintf(logFile,'Writing DTW results to Excel...\n');
-                writetable(combined_DTW_table, [outputFolder, '\spike_sorting.xlsx'], 'Sheet', 'DTW_Distances');
-                writetable(T_DTW_summary, [outputFolder, '\spike_sorting.xlsx'], 'Sheet', 'DTW_Summary');
+                writetable(combined_DTW_table, [outputFolder, '/spike_sorting.xlsx'], 'Sheet', 'DTW_Distances');
+                writetable(T_DTW_summary, [outputFolder, '/spike_sorting.xlsx'], 'Sheet', 'DTW_Summary');
                 
                 fprintf(logFile,'DTW analysis complete: %d unit pairs analyzed, %.1f%% merged\n', ...
                     total_pairs, merge_percentage);
@@ -285,7 +285,7 @@ function process_file(currentFile, file_folder, parentFolder, params, file_idx, 
     % Save PowerPoint
     if ~isempty(pptx)
         try
-            pptx.save([outputFolder, '\', baseFileName]);
+            pptx.save([outputFolder, '/', baseFileName]);
             fprintf(logFile,'PowerPoint presentation saved successfully.\n');
         catch ME
             fprintf(logFile,'Error saving PowerPoint: %s', ME.message);
@@ -293,7 +293,7 @@ function process_file(currentFile, file_folder, parentFolder, params, file_idx, 
     end
     
     % Save burst info
-    save([outputFolder, '\burst_info_all.mat'], 'raster_raw', 'maxTime', 'sorting_results', '-v7.3');
+    save([outputFolder, '/burst_info_all.mat'], 'raster_raw', 'maxTime', 'sorting_results', '-v7.3');
     
     % Perform network burst analysis
     fprintf(logFile,'Performing network burst analysis...\n');
@@ -308,8 +308,8 @@ function process_file(currentFile, file_folder, parentFolder, params, file_idx, 
     % Save results to Excel
     fprintf(logFile,'Writing results to Excel...\n');
     try
-        writetable(T, [outputFolder, '\spike_sorting.xlsx'], 'Sheet', 'individual unit');
-        writetable(T_electrode, [outputFolder, '\spike_sorting.xlsx'], 'Sheet', 'electrode statistics');
+        writetable(T, [outputFolder, '/spike_sorting.xlsx'], 'Sheet', 'individual unit');
+        writetable(T_electrode, [outputFolder, '/spike_sorting.xlsx'], 'Sheet', 'electrode statistics');
     catch ME
         fprintf(logFile,'Error writing main results to Excel: %s\n', ME.message);
     end
@@ -336,7 +336,7 @@ function process_file(currentFile, file_folder, parentFolder, params, file_idx, 
         T_pmua = cell2table(possibleMUAList', 'VariableNames', "Possible MultiUnit");
         T_flag = cell2table(flagTooMuchList', 'VariableNames', "over-exlcuded unit");
         T_checklist = [T_pmua T_flag];
-        writetable(T_checklist, [outputFolder, '\spike_sorting.xlsx'], 'Sheet', 'check list (active)');
+        writetable(T_checklist, [outputFolder, '/spike_sorting.xlsx'], 'Sheet', 'check list (active)');
     catch ME
         fprintf(logFile,'Error writing check list to Excel: %s\n', ME.message);
     end
