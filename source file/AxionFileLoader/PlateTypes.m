@@ -1,5 +1,5 @@
 %{
-    Copyright (c) 2022 Axion BioSystems, Inc.
+    Copyright (c) 2024 Axion BioSystems, Inc.
     Contact: support@axion-biosystems.com
     All Rights Reserved
 %}
@@ -17,6 +17,9 @@ classdef PlateTypes
 
         % Standard Muse single well
         P200D30S = uint32(hex2dec('0400001'));
+        
+        %Standard Creator Kit 2 "well"
+        MEACreatorKit = uint32(hex2dec('0800000'));
 
         % Debug Channel Mapping set for Maestro Edge systems
         LinearSixWell = uint32(hex2dec('1800000'));
@@ -38,6 +41,21 @@ classdef PlateTypes
 
         % CytoView-Z 96 (Impedance Product, Never Recorded)
         NinetySixWellImpedance =  uint32(hex2dec('1800006'));
+        
+        % CytoView-Z 96 well conductive tech (Impedance Product, Never Recorded)
+        NinetySixWellImpedanceConductiveTech =  uint32(hex2dec('1800007'));
+        
+        % Netri DualLink Edge
+        NetriDuaLinkEdge =  uint32(hex2dec('1800008'));
+        
+        % Netri DualLinkShift Edge
+        NetriDuaLinkShiftEdge =  uint32(hex2dec('1800009'));
+        
+        % Netri TrialLink Edge
+        NetriTrialLinkEdge =  uint32(hex2dec('180000A'));
+        
+        % Reserved
+        Reserved03 =  uint32(hex2dec('180000B'));
 
         % Debug Channel Mapping set for Maestro Pro systems
         LinearTwelveWell = uint32(hex2dec('3000000'));
@@ -54,7 +72,7 @@ classdef PlateTypes
         % CytoView MEA 48 well plate
         FortyEightWellTransparent =    uint32(hex2dec('3000004'));
 
-        % (Reserved ID, Never Recorded)
+        % (Reserved ID, Never Recorded) 
         Reserved01 = uint32(hex2dec('3000005'));
 
         % Lumos MEA 48 well plate
@@ -89,6 +107,24 @@ classdef PlateTypes
 
         % CytoView-Z 384 well plate (Impedance Product, Never Recorded)
         ThreeEightyFourWellImpedance = uint32(hex2dec('3000010'));
+        
+        % Netri DualLink Pro
+        NetriDuaLinkPro = uint32(hex2dec('3000011'));
+        
+        % Netri DualLinkShift Pro
+        NetriDuaLinkShiftPro = uint32(hex2dec('3000012'));
+        
+        % Netri TialLink Pro
+        NetriTrialLinkPro = uint32(hex2dec('3000013'));
+        
+        % Reserved ID
+        Reserved04 = uint32(hex2dec('3000014'));
+        
+        % CytoView MEA 48 well Organoid Plate
+        FortyEightWellOrganoid = uint32(hex2dec('3000015'));
+        
+        % CytoView MEA 12-well Transparent
+        TwelveWellTransparent = uint32(hex2dec('3000016'));
     end
 
     properties (Constant, Access=private)
@@ -96,9 +132,12 @@ classdef PlateTypes
         MUSE_MASK    = uint32(hex2dec('0400000'));
         MAESTRO_MASK = uint32(hex2dec('3000000'));
         EDGE_MASK    = uint32(hex2dec('1800000'));
+        CREATOR_MASK    = uint32(hex2dec('0800000'));
 
         MuseElectrodeMap = [ 1, 1, 8, 8;       ... % LinearSingleWell64
                              1, 1, 8, 8];          % P200D30S
+                         
+        CreatorElectrodeMap = [ 1, 2, 8, 8];    ... % MEA Creator Kit "2-well"
 
         EdgeElectrodeMap = [ 2, 3, 8, 8;       ... %LinearSixWell
                              4, 6, 4, 4;       ... %TwentyFourWell
@@ -106,7 +145,12 @@ classdef PlateTypes
                              2, 3, 8, 8;       ... %SixWell
                              4, 6, 4, 4;       ... %TwentyFourWellLumos
                              4, 6, 0, 0;       ... %TwentyFourWellOptiClear
-                             8, 12, 0, 0;];    ... %NinetySixWellImpedance
+                             8, 12, 0, 0;      ... %NinetySixWellImpedance
+                             8, 12, 0, 0;       ...NinetySixWellImpedanceConductiveTech
+                             2, 4, 11, 5;      ... %NetriDuaLinkEdge
+                             2, 4, 11, 5;      ... %NetriDuaLinkShiftEdge
+                             2, 4, 11, 5;      ... %NetriTrialLinkEdge
+                             2, 4, 11, 5;]     ... %Reserved03
 
         MaestroElectrodeMap = [ 3, 4, 8, 8;    ... %LinearTwelveWell
                                 3, 4, 8, 8;    ... %TwelveWell
@@ -124,7 +168,14 @@ classdef PlateTypes
                                 6, 8, 0, 0;    ... %FortyEightWellOptiClear
                                 8, 12, 0, 0;   ... %NinetySixWellOptiClear
                                 8, 12, 3, 3;   ... %Reserved02
-                                16, 24, 0, 0;];     %ThreeEightyFourWellImpedance
+                                16, 24, 0, 0;  ... %ThreeEightyFourWellImpedance
+                                4, 4, 11, 5;   ... %NetriDuaLinkPro
+                                4, 4, 11, 5;   ... %NetriDuaLinkShiftPro
+                                4, 4, 11, 5;   ... %NetriTrialLinkPro
+                                4, 4, 11, 5;  ... %Reserved04
+                                6, 8, 4, 4;  ... %FortyEightWellOrganoid
+                                3, 4, 8, 8;]  ... %TwelveWellTransparent
+                                
     end
 
     methods(Static)
@@ -135,8 +186,8 @@ classdef PlateTypes
             % First element is the number of well rows, second element
             % is the number of well columns.
             %
-
-            offset = bitand(aPlateType, 15);
+            PlateIDMask = 65535;
+            offset = bitand(aPlateType, PlateIDMask);
             if(aPlateType == PlateTypes.Empty)
                 fPlateDimentions = [];
             elseif (bitand(aPlateType, PlateTypes.MUSE_MASK) == PlateTypes.MUSE_MASK)
@@ -145,6 +196,8 @@ classdef PlateTypes
                fPlateDimentions = PlateTypes.MaestroElectrodeMap(offset + 1, (1:2));
             elseif (bitand(aPlateType, PlateTypes.EDGE_MASK) == PlateTypes.EDGE_MASK)
                fPlateDimentions = PlateTypes.EdgeElectrodeMap(offset + 1, (1:2));
+            elseif (bitand(aPlateType, PlateTypes.CREATOR_MASK) == PlateTypes.CREATOR_MASK)
+               fPlateDimentions = PlateTypes.CreatorElectrodeMap(offset + 1, (1:2));
             else
                 warning('File has an unknown plate type. These Matlab Scripts may be out of date.');
                 fPlateDimentions = [];
@@ -155,15 +208,18 @@ classdef PlateTypes
             % GetElectrodeDimensions returns a 4-element array of plate
             % dimensions (wells and electrodes within wells).
             %
-            % Format is [well rows, well columns, electrode rows, electrode
-            % columns].
+            % Format is [well rows, well columns, electrode columns, electrode rows].
             %
             % NOTE:  wells of a 96-well plates have 3 electrode rows an 3
             % electrode columns.  However, the second row contains only 2
             % valid electrodes.
             %
-
-            offset = bitand(aPlateType, 15);
+            % Second note: Netri plates have 48 electrodes per well, there
+            % are many locations in the mapping with no electodes:
+            % 11, 15, 61, 63, 65, b1, b5
+            %
+            PlateIDMask = 65535;
+            offset = bitand(aPlateType, PlateIDMask);
             if(aPlateType == PlateTypes.Empty)
                 fElectrodeDimentions = [];
             elseif (bitand(aPlateType, PlateTypes.MUSE_MASK) == PlateTypes.MUSE_MASK)
@@ -172,6 +228,8 @@ classdef PlateTypes
                fElectrodeDimentions = PlateTypes.MaestroElectrodeMap(offset + 1, :);
             elseif (bitand(aPlateType, PlateTypes.EDGE_MASK) == PlateTypes.EDGE_MASK)
                fElectrodeDimentions = PlateTypes.EdgeElectrodeMap(offset + 1, :);
+            elseif (bitand(aPlateType, PlateTypes.CREATOR_MASK) == PlateTypes.CREATOR_MASK)
+               fElectrodeDimentions = PlateTypes.CreatorElectrodeMap(offset + 1, :);
             else
                 warning('File has an unknown plate type. These Matlab Scripts may be out of date.');
                 fElectrodeDimentions = [];

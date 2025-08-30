@@ -33,7 +33,7 @@ function process_file_with_selected_wells(currentFile, file_folder, parentFolder
     % Initialize measurement tables and other variables
     % Initialize analysis tables
     [T, T_electrode, T_parameters] = initialize_tables(params);
-    writetable(T_parameters, [outputFolder, '\spike_sorting.xlsx'], 'Sheet', 'parameter list');
+    writetable(T_parameters, [outputFolder, '/spike_sorting.xlsx'], 'Sheet', 'parameter list');
     
     % Initialize data structures
     raster_raw = {};
@@ -271,7 +271,7 @@ function process_file_with_selected_wells(currentFile, file_folder, parentFolder
     % Save PowerPoint
     if ~isempty(pptx)
         try
-            pptx.save([outputFolder, '\', baseFileName]);
+            pptx.save([outputFolder, '/', baseFileName]);
             fprintf('PowerPoint presentation saved successfully.\n');
         catch ME
             warning('Error saving PowerPoint: %s', ME.message);
@@ -279,7 +279,7 @@ function process_file_with_selected_wells(currentFile, file_folder, parentFolder
     end
 
     % Save burst info
-    save([outputFolder, '\burst_info_all.mat'], 'raster_raw', 'maxTime', 'sorting_results', '-v7.3');
+    save([outputFolder, '/burst_info_all.mat'], 'raster_raw', 'maxTime', 'sorting_results', '-v7.3');
 
     % Perform network burst analysis
     fprintf('Performing network burst analysis...\n');
@@ -289,8 +289,8 @@ function process_file_with_selected_wells(currentFile, file_folder, parentFolder
 
     % Save results to Excel
     fprintf('Writing results to Excel...\n');
-    writetable(T, [outputFolder, '\spike_sorting.xlsx'], 'Sheet', 'individual unit');
-    writetable(T_electrode, [outputFolder, '\spike_sorting.xlsx'], 'Sheet', 'electrode statistics');
+    writetable(T, [outputFolder, '/spike_sorting.xlsx'], 'Sheet', 'individual unit');
+    writetable(T_electrode, [outputFolder, '/spike_sorting.xlsx'], 'Sheet', 'electrode statistics');
 
     % Save check lists
     if isempty(possibleMUAList)
@@ -316,7 +316,7 @@ function process_file_with_selected_wells(currentFile, file_folder, parentFolder
     % Now they can be safely concatenated
     T_checklist = [T_pmua T_flag];
     T_checklist = [T_pmua T_flag];
-    writetable(T_checklist, [outputFolder, '\spike_sorting.xlsx'], 'Sheet', 'check list (active)');
+    writetable(T_checklist, [outputFolder, '/spike_sorting.xlsx'], 'Sheet', 'check list (active)');
     % Close the notification window now that all outputs are written
     try
         if exist('h', 'var') && ishandle(h)
